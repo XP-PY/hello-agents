@@ -21,8 +21,8 @@ def search(query: str) -> str:
             "engine": "google",
             "q": query,
             "api_key": api_key,
-            "gl": "cn",  # 国家代码
-            "hl": "zh-cn", # 语言代码
+            "gl": "cn",         # 国家代码
+            "hl": "zh-cn",      # 语言代码
         }
         
         client = SerpApiClient(params)

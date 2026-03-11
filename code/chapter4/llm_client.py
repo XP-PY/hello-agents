@@ -1,3 +1,4 @@
+import pkg
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -16,8 +17,8 @@ class HelloAgentsLLM:
         初始化客户端。优先使用传入参数，如果未提供，则从环境变量加载。
         """
         self.model = model or os.getenv("LLM_MODEL_ID")
-        apiKey = apiKey or os.getenv("LLM_API_KEY")
-        baseUrl = baseUrl or os.getenv("LLM_BASE_URL")
+        apiKey = apiKey or os.getenv("ALIYUN_API_KEY")
+        baseUrl = baseUrl or os.getenv("ALIYUN_BASE_URL")
         timeout = timeout or int(os.getenv("LLM_TIMEOUT", 60))
         
         if not all([self.model, apiKey, baseUrl]):

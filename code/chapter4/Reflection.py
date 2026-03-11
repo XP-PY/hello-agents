@@ -1,6 +1,8 @@
+import pkg
 from typing import List, Dict, Any
 # 假设 llm_client.py 文件已存在，并从中导入 HelloAgentsLLM 类
 from llm_client import HelloAgentsLLM
+from utils import setup_logging, log_info
 
 # --- 模块 1: 记忆模块 ---
 
@@ -21,7 +23,7 @@ class Memory:
         - content (str): 记录的具体内容 (例如，生成的代码或反思的反馈)。
         """
         self.records.append({"type": record_type, "content": content})
-        print(f"📝 记忆已更新，新增一条 '{record_type}' 记录。")
+        log_info(f"📝 记忆已更新，新增一条 '{record_type}' 记录。")
 
     def get_trajectory(self) -> str:
         """
@@ -101,20 +103,20 @@ class ReflectionAgent:
         self.max_iterations = max_iterations
 
     def run(self, task: str):
-        print(f"\n--- 开始处理任务 ---\n任务: {task}")
+        log_info(f"\n--- 开始处理任务 ---\n任务: {task}")
 
         # --- 1. 初始执行 ---
-        print("\n--- 正在进行初始尝试 ---")
+        log_info("\n--- 正在进行初始尝试 ---")
         initial_prompt = INITIAL_PROMPT_TEMPLATE.format(task=task)
         initial_code = self._get_llm_response(initial_prompt)
         self.memory.add_record("execution", initial_code)
 
         # --- 2. 迭代循环：反思与优化 ---
         for i in range(self.max_iterations):
-            print(f"\n--- 第 {i+1}/{self.max_iterations} 轮迭代 ---")
+            log_info(f"\n--- 第 {i+1}/{self.max_iterations} 轮迭代 ---")
 
             # a. 反思
-            print("\n-> 正在进行反思...")
+            log_info("\n-> 正在进行反思...")
             last_code = self.memory.get_last_execution()
             reflect_prompt = REFLECT_PROMPT_TEMPLATE.format(task=task, code=last_code)
             feedback = self._get_llm_response(reflect_prompt)
@@ -122,11 +124,11 @@ class ReflectionAgent:
 
             # b. 检查是否需要停止
             if "无需改进" in feedback or "no need for improvement" in feedback.lower():
-                print("\n✅ 反思认为代码已无需改进，任务完成。")
+                log_info("\n✅ 反思认为代码已无需改进，任务完成。")
                 break
 
             # c. 优化
-            print("\n-> 正在进行优化...")
+            log_info("\n-> 正在进行优化...")
             refine_prompt = REFINE_PROMPT_TEMPLATE.format(
                 task=task,
                 last_code_attempt=last_code,
@@ -136,7 +138,7 @@ class ReflectionAgent:
             self.memory.add_record("execution", refined_code)
         
         final_code = self.memory.get_last_execution()
-        print(f"\n--- 任务完成 ---\n最终生成的代码:\n{final_code}")
+        log_info(f"\n--- 任务完成 ---\n最终生成的代码:\n{final_code}")
         return final_code
 
     def _get_llm_response(self, prompt: str) -> str:
@@ -147,11 +149,14 @@ class ReflectionAgent:
         return response_text
 
 if __name__ == '__main__':
+    setup_logging("./code/chapter4/running.log")
+    log_info("\n"+"="*40+"\n"+" "*10+"Reflection"+"\n"+"="*40)
+
     # 1. 初始化LLM客户端 (请确保你的 .env 和 llm_client.py 文件配置正确)
     try:
         llm_client = HelloAgentsLLM()
     except Exception as e:
-        print(f"初始化LLM客户端时出错: {e}")
+        log_info(f"初始化LLM客户端时出错: {e}")
         exit()
 
     # 2. 初始化 Reflection 智能体，设置最多迭代2轮

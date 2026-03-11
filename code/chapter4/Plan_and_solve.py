@@ -1,16 +1,17 @@
-import os
+import pkg
 import ast
 from llm_client import HelloAgentsLLM
 from dotenv import load_dotenv
 from typing import List, Dict
+from utils import setup_logging, log_info
 
 # 加载 .env 文件中的环境变量，处理文件不存在异常
 try:
     load_dotenv()
 except FileNotFoundError:
-    print("警告：未找到 .env 文件，将使用系统环境变量。")
+    log_info("警告：未找到 .env 文件，将使用系统环境变量。")
 except Exception as e:
-    print(f"警告：加载 .env 文件时出错: {e}")
+    log_info(f"警告：加载 .env 文件时出错: {e}")
 
 # --- 1. LLM客户端定义 ---
 # 假设你已经有llm_client.py文件，里面定义了HelloAgentsLLM类
@@ -37,20 +38,20 @@ class Planner:
         prompt = PLANNER_PROMPT_TEMPLATE.format(question=question)
         messages = [{"role": "user", "content": prompt}]
         
-        print("--- 正在生成计划 ---")
+        log_info("--- 正在生成计划 ---")
         response_text = self.llm_client.think(messages=messages) or ""
-        print(f"✅ 计划已生成:\n{response_text}")
+        log_info(f"✅ 计划已生成:\n{response_text}")
         
         try:
             plan_str = response_text.split("```python")[1].split("```")[0].strip()
             plan = ast.literal_eval(plan_str)
             return plan if isinstance(plan, list) else []
         except (ValueError, SyntaxError, IndexError) as e:
-            print(f"❌ 解析计划时出错: {e}")
-            print(f"原始响应: {response_text}")
+            log_info(f"❌ 解析计划时出错: {e}")
+            log_info(f"原始响应: {response_text}")
             return []
         except Exception as e:
-            print(f"❌ 解析计划时发生未知错误: {e}")
+            log_info(f"❌ 解析计划时发生未知错误: {e}")
             return []
 
 # --- 3. 执行器 (Executor) 定义 ---
@@ -82,9 +83,9 @@ class Executor:
         history = ""
         final_answer = ""
         
-        print("\n--- 正在执行计划 ---")
+        log_info("\n--- 正在执行计划 ---")
         for i, step in enumerate(plan, 1):
-            print(f"\n-> 正在执行步骤 {i}/{len(plan)}: {step}")
+            log_info(f"\n-> 正在执行步骤 {i}/{len(plan)}: {step}")
             prompt = EXECUTOR_PROMPT_TEMPLATE.format(
                 question=question, plan=plan, history=history if history else "无", current_step=step
             )
@@ -94,7 +95,7 @@ class Executor:
             
             history += f"步骤 {i}: {step}\n结果: {response_text}\n\n"
             final_answer = response_text
-            print(f"✅ 步骤 {i} 已完成，结果: {final_answer}")
+            log_info(f"✅ 步骤 {i} 已完成，结果: {final_answer}")
             
         return final_answer
 
@@ -106,20 +107,22 @@ class PlanAndSolveAgent:
         self.executor = Executor(self.llm_client)
 
     def run(self, question: str):
-        print(f"\n--- 开始处理问题 ---\n问题: {question}")
+        log_info(f"\n--- 开始处理问题 ---\n问题: {question}")
         plan = self.planner.plan(question)
         if not plan:
-            print("\n--- 任务终止 --- \n无法生成有效的行动计划。")
+            log_info("\n--- 任务终止 --- \n无法生成有效的行动计划。")
             return
         final_answer = self.executor.execute(question, plan)
-        print(f"\n--- 任务完成 ---\n最终答案: {final_answer}")
+        log_info(f"\n--- 任务完成 ---\n最终答案: {final_answer}")
 
 # --- 5. 主函数入口 ---
 if __name__ == '__main__':
+    setup_logging("./code/chapter4/running.log")
+    log_info("\n"+"="*40+"\n"+" "*10+"Plan_and_solve"+"\n"+"="*40)
     try:
         llm_client = HelloAgentsLLM()
         agent = PlanAndSolveAgent(llm_client)
         question = "一个水果店周一卖出了15个苹果。周二卖出的苹果数量是周一的两倍。周三卖出的数量比周二少了5个。请问这三天总共卖出了多少个苹果？"
         agent.run(question)
     except ValueError as e:
-        print(e)
+        log_info(e)
