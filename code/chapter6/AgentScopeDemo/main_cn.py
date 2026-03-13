@@ -61,7 +61,7 @@ class ThreeKingdomsWerewolfGame:
             name=name,
             sys_prompt=ChinesePrompts.get_role_prompt(role, character),
             model=DashScopeChatModel(
-                model_name="qwen-max",
+                model_name="deepseek-v3.2",
                 api_key=os.environ["DASHSCOPE_API_KEY"],
                 enable_thinking=True,
             ),

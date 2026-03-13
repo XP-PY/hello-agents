@@ -1,0 +1,8 @@
+Collecting plotly
+  Downloading plotly-6.6.0-py3-none-any.whl.metadata (8.5 kB)
+Requirement already satisfied: narwhals>=1.15.1 in /home/yuel_p/miniconda3/envs/ZOO/lib/python3.12/site-packages (from plotly) (2.18.0)
+Requirement already satisfied: packaging in /home/yuel_p/miniconda3/envs/ZOO/lib/python3.12/site-packages (from plotly) (25.0)
+Downloading plotly-6.6.0-py3-none-any.whl (9.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.9/9.9 MB 2.8 MB/s  0:00:03
+Installing collected packages: plotly
+Successfully installed plotly-6.6.0

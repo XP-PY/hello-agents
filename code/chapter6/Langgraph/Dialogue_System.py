@@ -31,8 +31,8 @@ class SearchState(TypedDict):
 # 初始化模型和Tavily客户端
 llm = ChatOpenAI(
     model=os.getenv("LLM_MODEL_ID", "gpt-4o-mini"),
-    api_key=os.getenv("LLM_API_KEY"),
-    base_url=os.getenv("LLM_BASE_URL", "https://api.openai.com/v1"),
+    api_key=os.getenv("ALIYUN_API_KEY"),
+    base_url=os.getenv("ALIYUN_BASE_URL", "https://api.openai.com/v1"),
     temperature=0.7
 )
 

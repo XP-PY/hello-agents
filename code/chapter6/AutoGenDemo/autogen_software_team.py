@@ -1,11 +1,12 @@
 """
 AutoGen 软件开发团队协作案例
 """
-
+import pkg
 import os
 import asyncio
 from typing import List, Dict, Any
 from dotenv import load_dotenv
+from utils import setup_logging, log_info
 
 # 加载环境变量
 load_dotenv()
@@ -21,8 +22,15 @@ def create_openai_model_client():
     """创建 OpenAI 模型客户端用于测试"""
     return OpenAIChatCompletionClient(
         model=os.getenv("LLM_MODEL_ID", "gpt-4o"),
-        api_key=os.getenv("LLM_API_KEY"),
-        base_url=os.getenv("LLM_BASE_URL", "https://api.openai.com/v1")
+        api_key=os.getenv("ALIYUN_API_KEY"),
+        base_url=os.getenv("ALIYUN_BASE_URL", "https://api.openai.com/v1"),
+        model_info={
+            "vision": False,
+            "function_calling": True,
+            "json_output": True,
+            "family": "unknown",
+            "structured_output": False,
+        },
     )
 
 def create_product_manager(model_client):
@@ -116,12 +124,12 @@ def create_user_proxy():
 async def run_software_development_team():
     """运行软件开发团队协作"""
     
-    print("🔧 正在初始化模型客户端...")
+    log_info("🔧 正在初始化模型客户端...")
     
     # 先使用标准的 OpenAI 客户端测试
     model_client = create_openai_model_client()
     
-    print("👥 正在创建智能体团队...")
+    log_info("👥 正在创建智能体团队...")
     
     # 创建智能体团队
     product_manager = create_product_manager(model_client)
@@ -160,32 +168,34 @@ async def run_software_development_team():
 请团队协作完成这个任务，从需求分析到最终实现。"""
     
     # 执行团队协作
-    print("🚀 启动 AutoGen 软件开发团队协作...")
-    print("=" * 60)
+    log_info("🚀 启动 AutoGen 软件开发团队协作...")
+    log_info("=" * 60)
     
     # 使用 Console 来显示对话过程
     result = await Console(team_chat.run_stream(task=task))
     
-    print("\n" + "=" * 60)
-    print("✅ 团队协作完成！")
+    log_info("\n" + "=" * 60)
+    log_info("✅ 团队协作完成！")
     
     return result
 
 # 主程序入口
 if __name__ == "__main__":
+    setup_logging("./code/chapter6/AutoGenDemo/running.log")
+    log_info("\n"+"="*40+"\n"+" "*10+"autogen_software_team"+"\n"+"="*40)
     try:
         # 运行异步协作流程
         result = asyncio.run(run_software_development_team())
         
-        print(f"\n📋 协作结果摘要：")
-        print(f"- 参与智能体数量：4个")
-        print(f"- 任务完成状态：{'成功' if result else '需要进一步处理'}")
+        log_info(f"\n📋 协作结果摘要：")
+        log_info(f"- 参与智能体数量：4个")
+        log_info(f"- 任务完成状态：{'成功' if result else '需要进一步处理'}")
         
     except ValueError as e:
-        print(f"❌ 配置错误：{e}")
-        print("请检查 .env 文件中的配置是否正确")
+        log_info(f"❌ 配置错误：{e}")
+        log_info("请检查 .env 文件中的配置是否正确")
     except Exception as e:
-        print(f"❌ 运行错误：{e}")
+        log_info(f"❌ 运行错误：{e}")
         import traceback
         traceback.print_exc()
 
