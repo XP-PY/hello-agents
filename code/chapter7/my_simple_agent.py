@@ -15,7 +15,7 @@ class MySimpleAgent(SimpleAgent):
         llm: HelloAgentsLLM,
         system_prompt: Optional[str] = None,
         config: Optional[Config] = None,
-        tool_registry: Optional['ToolRegistry'] = None,
+        tool_registry: Optional['ToolRegistry'] = None,     # type: ignore
         enable_tool_calling: bool = True
     ):
         super().__init__(name, llm, system_prompt, config)

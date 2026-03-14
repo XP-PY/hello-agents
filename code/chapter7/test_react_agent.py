@@ -1,4 +1,5 @@
 # test_react_agent.py
+import os
 from dotenv import load_dotenv
 from hello_agents import HelloAgentsLLM, ToolRegistry
 from my_react_agent import MyReActAgent
@@ -10,7 +11,11 @@ def test_react_agent():
     """测试MyReActAgent的功能"""
     
     # 创建LLM实例
-    llm = HelloAgentsLLM()
+    llm = HelloAgentsLLM(
+        model='MiniMax-M2.5',
+        api_key=os.getenv("ALIYUN_API_KEY"),
+        base_url=os.getenv("ALIYUN_BASE_URL")
+    )
     
     # 创建工具注册表
     tool_registry = ToolRegistry()

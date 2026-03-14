@@ -1,4 +1,5 @@
 # test_simple_agent.py
+import os
 from dotenv import load_dotenv
 from hello_agents import HelloAgentsLLM, ToolRegistry
 from hello_agents.tools import CalculatorTool
@@ -8,7 +9,11 @@ from my_simple_agent import MySimpleAgent
 load_dotenv()
 
 # 创建LLM实例
-llm = HelloAgentsLLM()
+llm = HelloAgentsLLM(
+    model='MiniMax-M2.5',
+    api_key=os.getenv("ALIYUN_API_KEY"),
+    base_url=os.getenv("ALIYUN_BASE_URL")
+)
 
 # 测试1：基础对话Agent（无工具）
 print("=== 测试1：基础对话 ===")
